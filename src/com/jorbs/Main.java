@@ -5,10 +5,10 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        CalculateChancesTests();
+        Tests();
     }
 
-    public static void CalculateChancesTests(){
+    public static void Tests(){
         System.out.println(
             "0% chance, because you're broke" ==
             TFTChanceCalculator.CalculateChances(
@@ -46,7 +46,10 @@ public class Main {
                         TFTChanceCalculator.CalculateChances(
                                 new TFTChanceCalculator.InputParameters(2,2,5,5,5) ));
 
-        System.out.println(.001 > 0.3 - TFTChanceCalculator.getChoiceProbability(1, 9, 3));
+        System.out.println(.001 > 0.3 - TFTChanceCalculator.GetChoiceProbability(1, 9, 3));
+        System.out.println(.0001 > .5 - TFTChanceCalculator.probabilityBeforeBroke(.5, 2));
+        System.out.println(.0001 > .75 - TFTChanceCalculator.probabilityBeforeBroke(.5, 4));
+        System.out.println(.0001 > .875 - TFTChanceCalculator.probabilityBeforeBroke(.5, 6));
     }
 
     public static void InputLoop(){
