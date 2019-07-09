@@ -28,10 +28,10 @@ public class Main {
         System.out.println(new TFTChanceCalculator.InputParameters(4, 30, 16, 80, 3).equals(
                 TFTChanceCalculator.ParseInputString("Level 4, GOLD 30, rEmAiNiNg 16, otherS 80, tier 3")));
         System.out.println("1 missing pair");
-        System.out.println(new TFTChanceCalculator.InputParameters(4, 0, 16, 80, 3).equals(
+        System.out.println(new TFTChanceCalculator.InputParameters(4, -1, 16, 80, 3).equals(
                 TFTChanceCalculator.ParseInputString("level 4, remaining 16, others 80, tier 3")));
         System.out.println("some missing pairs");
-        System.out.println(new TFTChanceCalculator.InputParameters(4, 0, 0, 80, 3).equals(
+        System.out.println(new TFTChanceCalculator.InputParameters(4, -1, -1, 80, 3).equals(
                 TFTChanceCalculator.ParseInputString("level 4, others 80, tier 3")));
         System.out.println("mixed pairs");
         System.out.println(new TFTChanceCalculator.InputParameters(4, 30, 16, 80, 3).equals(
@@ -40,19 +40,19 @@ public class Main {
         System.out.println(new TFTChanceCalculator.InputParameters(4, 30, 16, 80, 3).equals(
                 TFTChanceCalculator.ParseInputString("level 4,, gold 30,,, remaining 16, others 80, tier 3")));
         System.out.println("missing value");
-        System.out.println(new TFTChanceCalculator.InputParameters(0, 30, 16, 80, 3).equals(
+        System.out.println(new TFTChanceCalculator.InputParameters(-1, 30, 16, 80, 3).equals(
                 TFTChanceCalculator.ParseInputString("level, gold 30, remaining 16, others 80, tier 3")));
         System.out.println("missing values");
-        System.out.println(new TFTChanceCalculator.InputParameters(0, 30, 0, 80, 3).equals(
+        System.out.println(new TFTChanceCalculator.InputParameters(-1, 30, -1, 80, 3).equals(
                 TFTChanceCalculator.ParseInputString("level, gold 30, remaining, others 80, tier 3")));
         System.out.println("missing parameter");
-        System.out.println(new TFTChanceCalculator.InputParameters(0, 30, 16, 80, 3).equals(
+        System.out.println(new TFTChanceCalculator.InputParameters(-1, 30, 16, 80, 3).equals(
                 TFTChanceCalculator.ParseInputString("4, gold 30, remaining 16, others 80, tier 3")));
         System.out.println("missing parameters");
-        System.out.println(new TFTChanceCalculator.InputParameters(4, 0, 16, 0, 3).equals(
+        System.out.println(new TFTChanceCalculator.InputParameters(4, -1, 16, 0, 3).equals(
                 TFTChanceCalculator.ParseInputString("level 4, 30, remaining 16, 80, tier 3")));
         System.out.println("empty string");
-        System.out.println(new TFTChanceCalculator.InputParameters(0,0,0,0,0).equals(
+        System.out.println(new TFTChanceCalculator.InputParameters(-1, -1, -1, -1, -1).equals(
                 TFTChanceCalculator.ParseInputString("")));
     }
 
@@ -64,6 +64,14 @@ public class Main {
     }
 
     public static void TestErrors(){
+        System.out.println(
+                "You forgot to provide: level".equals(
+                        TFTChanceCalculator.CalculateChances(
+                                new TFTChanceCalculator.InputParameters(-1,2,1,0,1) )));
+        System.out.println(
+                "You forgot to provide: level, gold, remaining, others, tier".equals(
+                        TFTChanceCalculator.CalculateChances(
+                                new TFTChanceCalculator.InputParameters(-1, -1, -1, -1, -1) )));
         System.out.println(
                 "0% chance, because you're broke" ==
                         TFTChanceCalculator.CalculateChances(

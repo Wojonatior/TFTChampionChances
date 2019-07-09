@@ -1,6 +1,7 @@
 package com.jorbs;
 
 import java.lang.Math;
+import java.util.ArrayList;
 
 public class TFTChanceCalculator {
     public static class InputParameters {
@@ -136,7 +137,27 @@ public class TFTChanceCalculator {
         return cumalativeProbability;
     }
 
-    public static String CalculateChances(InputParameters parameters){
+    public static String CheckMissingParams(InputParameters parameters){
+        ArrayList<String> missingParams = new ArrayList<String>();
+        if(parameters.CurrentLevel == -1)
+            missingParams.add("level");
+        if(parameters.GoldAvailable == -1)
+            missingParams.add("gold");
+        if(parameters.Remaining == -1)
+            missingParams.add("remaining");
+        if(parameters.Others == -1)
+            missingParams.add("others");
+        if(parameters.Tier == -1)
+            missingParams.add("tier");
+        if(!missingParams.isEmpty())
+            return "You forgot to provide: " + String.join(", ", missingParams);
+        return null;
+    }
+
+    public static String CheckForErrors(InputParameters parameters){
+        String missingParamsMessage = CheckMissingParams(parameters);
+        if(missingParamsMessage != null)
+            return missingParamsMessage;
         if(parameters.GoldAvailable < REROLL_COST)
             return "0% chance, because you're broke";
         if(parameters.CurrentLevel < 2  || parameters.CurrentLevel > ProbabilityTable.length)
@@ -145,11 +166,20 @@ public class TFTChanceCalculator {
             return "That's not a valid tier";
         if(ProbabilityTable[parameters.CurrentLevel - 1].length < parameters.Tier)
             return "Your level doesn't have champions of that tier";
+        return null;
+    }
+
+    public static String CalculateChances(InputParameters parameters){
+        String errorMessage = CheckForErrors(parameters);
+        if(errorMessage != null)
+            return errorMessage;
+
         double tierProbability = ProbabilityTable[parameters.CurrentLevel - 1][parameters.Tier - 1];
         double champChoiceProbability = GetChoiceProbability(parameters.Remaining, parameters.Others, NUM_PICKS);
         double totalProbability = tierProbability * champChoiceProbability;
         double singleRerollDeviation = REROLL_COST *  GetBinomialDeviation(totalProbability, 1);
         double probabilityBeforeBroke = ProbabilityBeforeBroke(totalProbability, parameters.GoldAvailable);
+
         return String.format("%.2f% likely per reroll, deviation of cost: %.2f gold, chance to hit before broke: %.2f%.",
                 totalProbability,
                 singleRerollDeviation,
