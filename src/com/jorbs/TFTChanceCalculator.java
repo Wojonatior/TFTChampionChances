@@ -4,7 +4,7 @@ import java.lang.Math;
 import java.util.ArrayList;
 
 public class TFTChanceCalculator {
-    public static class InputParameters {
+    protected static class InputParameters {
         public int CurrentLevel;
         public int GoldAvailable;
         public int Remaining;
@@ -33,9 +33,9 @@ public class TFTChanceCalculator {
         }
     }
 
-    static int NUM_PICKS = 5;
-    static int REROLL_COST = 2;
-    static double[][] ProbabilityTable = {
+    private static int NUM_PICKS = 5;
+    private static int REROLL_COST = 2;
+    private static double[][] ProbabilityTable = {
             {},
             {100},
             {65, 30, 5},
@@ -47,15 +47,15 @@ public class TFTChanceCalculator {
             {10, 15, 35, 30, 10}
     };
 
-    public static boolean HasNumbers(String str){
+    private static boolean HasNumbers(String str){
         return str.matches(".*\\d.*");
     }
 
-    public static boolean HasLetters(String str){
+    private static boolean HasLetters(String str){
         return str.matches(".*\\D.*");
     }
 
-    public static InputParameters AssignParameter(String paramName, int paramValue, InputParameters params){
+    private static InputParameters AssignParameter(String paramName, int paramValue, InputParameters params){
         switch(paramName) {
             case "level":
                 params.CurrentLevel = paramValue;
@@ -78,7 +78,7 @@ public class TFTChanceCalculator {
         return params;
     }
 
-    public static InputParameters SplitTokenAndAssign(String mixedToken, InputParameters params){
+    private static InputParameters SplitTokenAndAssign(String mixedToken, InputParameters params){
         String[] splitToken = mixedToken.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
         if(splitToken.length == 2) {
             if (HasLetters(splitToken[0]))
@@ -89,7 +89,7 @@ public class TFTChanceCalculator {
         return params;
     }
 
-    public static InputParameters ParseInputString(String input){
+    protected static InputParameters ParseInputString(String input){
         String[] tokens = input.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().split("\\s+");
         InputParameters params = new InputParameters(-1, -1,-1,-1,-1);
         String paramName = null;
@@ -113,7 +113,7 @@ public class TFTChanceCalculator {
         return params;
     }
 
-    public static double GetChoiceProbability(double desiredRemaining, double otherRemaining, double numPicks){
+    protected static double GetChoiceProbability(double desiredRemaining, double otherRemaining, double numPicks){
         double total = desiredRemaining + otherRemaining;
         double cumalativeProbability = 0;
         for(int i=0; i<numPicks; i+=1){
@@ -123,11 +123,11 @@ public class TFTChanceCalculator {
         return cumalativeProbability;
     }
 
-    public static double GetBinomialDeviation(double probability, double n){
+    private static double GetBinomialDeviation(double probability, double n){
         return Math.sqrt(n * probability * (1.0 - probability));
     }
 
-    public static double ProbabilityBeforeBroke(double probability, int goldRemaining){
+    protected static double ProbabilityBeforeBroke(double probability, int goldRemaining){
         int chancesRemaining = goldRemaining / REROLL_COST;
         double cumalativeProbability = 0;
         for(int i=0; i<chancesRemaining; i++){
@@ -137,7 +137,7 @@ public class TFTChanceCalculator {
         return cumalativeProbability;
     }
 
-    public static String CheckMissingParams(InputParameters parameters){
+    private static String CheckMissingParams(InputParameters parameters){
         ArrayList<String> missingParams = new ArrayList<String>();
         if(parameters.CurrentLevel == -1)
             missingParams.add("level");
@@ -154,7 +154,7 @@ public class TFTChanceCalculator {
         return null;
     }
 
-    public static String CheckForErrors(InputParameters parameters){
+    private static String CheckForErrors(InputParameters parameters){
         String missingParamsMessage = CheckMissingParams(parameters);
         if(missingParamsMessage != null)
             return missingParamsMessage;
@@ -169,7 +169,7 @@ public class TFTChanceCalculator {
         return null;
     }
 
-    public static String CalculateChances(InputParameters parameters){
+    protected static String CalculateChances(InputParameters parameters){
         String errorMessage = CheckForErrors(parameters);
         if(errorMessage != null)
             return errorMessage;
@@ -184,9 +184,10 @@ public class TFTChanceCalculator {
                 totalProbability,
                 singleRerollDeviation,
                 probabilityBeforeBroke);
+    }
 
-
-//        "There are 0 of the champion that you want remaining";
-//        "You provided less than 5 total champs"; ???
+    public static String CreateBotResponse (String inputString) {
+        InputParameters inputParameters = TFTChanceCalculator.ParseInputString(inputString);
+        return TFTChanceCalculator.CalculateChances(inputParameters);
     }
 }

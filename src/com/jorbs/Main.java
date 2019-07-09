@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        TestErrors();
+        InputLoop();
     }
 
     public static void TestInputParser(){
@@ -117,9 +117,7 @@ public class Main {
         System.out.println("Tell me what you'd like to calculate your chances on:");
         while(textInput.length() > 0){
             textInput = scanner.nextLine();
-            TFTChanceCalculator.InputParameters inputParameters = TFTChanceCalculator.ParseInputString(textInput);
-            String responseString = TFTChanceCalculator.CalculateChances(inputParameters);
-            System.out.println(responseString);
+            System.out.println(TFTChanceCalculator.CreateBotResponse(textInput));
         }
     }
 }
