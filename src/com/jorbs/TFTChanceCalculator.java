@@ -17,6 +17,19 @@ public class TFTChanceCalculator {
             Others = others;
             Tier = tier;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            InputParameters params = (InputParameters) o;
+            return CurrentLevel == params.CurrentLevel &&
+                    GoldAvailable == params.GoldAvailable &&
+                    Remaining == params.Remaining &&
+                    Others == params.Others &&
+                    Tier == params.Tier;
+        }
     }
 
     static int NUM_PICKS = 5;
@@ -33,10 +46,70 @@ public class TFTChanceCalculator {
             {10, 15, 35, 30, 10}
     };
 
-    public static InputParameters parseInputString(String input){
-        // Basic spellcheck?
-        // Split into pairs and look for keywords in pair to identify
-        return new InputParameters(0,0,0,0,0);
+    public static boolean HasNumbers(String str){
+        return str.matches(".*\\d.*");
+    }
+
+    public static boolean HasLetters(String str){
+        return str.matches(".*\\D.*");
+    }
+
+    public static InputParameters AssignParameter(String paramName, int paramValue, InputParameters params){
+        switch(paramName) {
+            case "level":
+                params.CurrentLevel = paramValue;
+                break;
+            case "gold":
+                params.GoldAvailable = paramValue;
+                break;
+            case "remaining":
+                params.Remaining = paramValue;
+                break;
+            case "others":
+                params.Others = paramValue;
+                break;
+            case "tier":
+                params.Tier = paramValue;
+                break;
+            default:
+                break;
+        }
+        return params;
+    }
+
+    public static InputParameters SplitTokenAndAssign(String mixedToken, InputParameters params){
+        String[] splitToken = mixedToken.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+        if(splitToken.length == 2) {
+            if (HasLetters(splitToken[0]))
+                params = AssignParameter(splitToken[0], Integer.parseInt(splitToken[1]), params);
+            else
+                params = AssignParameter(splitToken[1], Integer.parseInt(splitToken[0]), params);
+        }
+        return params;
+    }
+
+    public static InputParameters ParseInputString(String input){
+        String[] tokens = input.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().split("\\s+");
+        InputParameters params = new InputParameters(-1, -1,-1,-1,-1);
+        String paramName = null;
+        int paramValue = -1;
+
+        for(int i=0; i<tokens.length; i+=1){
+            if(HasNumbers(tokens[i]) && HasLetters(tokens[i]))
+                params = SplitTokenAndAssign(tokens[i], params);
+            else {
+                if(HasLetters(tokens[i]))
+                    paramName = tokens[i];
+                if(HasNumbers(tokens[i]))
+                    paramValue = Integer.parseInt(tokens[i]);
+                if(paramValue > -1 && paramName != null){
+                    params = AssignParameter(paramName, paramValue, params);
+                    paramName = null;
+                    paramValue = -1;
+                }
+            }
+        }
+        return params;
     }
 
     public static double GetChoiceProbability(double desiredRemaining, double otherRemaining, double numPicks){
