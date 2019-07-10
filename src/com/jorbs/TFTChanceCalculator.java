@@ -37,14 +37,15 @@ public class TFTChanceCalculator {
     private static int REROLL_COST = 2;
     private static double[][] ProbabilityTable = {
             {},
-            {100},
-            {65, 30, 5},
-            {50, 35, 15},
-            {37, 35, 25, 3},
-            {24.5, 35, 30, 10, .5},
-            {20, 30, 33, 15, 2},
-            {15, 25, 35, 20, 5},
-            {10, 15, 35, 30, 10}
+            {1.00},
+            {.65, .30, .05},
+            {.50, .35, .15},
+            {.37, .35, .25, .03},
+            {.37, .35, .25, .03},
+            {.245, .35, .30, .10, .005},
+            {.20, .30, .33, .15, .02},
+            {.15, .25, .35, .20, .05},
+            {.10, .15, .35, .30, .10}
     };
 
     private static boolean HasNumbers(String str){
@@ -180,10 +181,10 @@ public class TFTChanceCalculator {
         double singleRerollDeviation = REROLL_COST *  GetBinomialDeviation(totalProbability, 1);
         double probabilityBeforeBroke = ProbabilityBeforeBroke(totalProbability, parameters.GoldAvailable);
 
-        return String.format("%.2f% likely per reroll, deviation of cost: %.2f gold, chance to hit before broke: %.2f%.",
-                totalProbability,
+        return String.format("%.2f%% likely per reroll, deviation of cost: %.2f gold, chance to hit before broke: %.2f%%.",
+                totalProbability * 100,
                 singleRerollDeviation,
-                probabilityBeforeBroke);
+                probabilityBeforeBroke * 100);
     }
 
     public static String CreateBotResponse (String inputString) {
