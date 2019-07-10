@@ -191,7 +191,11 @@ public class TFTChanceCalculator {
     }
 
     public static String CreateBotResponse (String inputString) {
-        InputParameters inputParameters = TFTChanceCalculator.ParseInputString(inputString);
-        return TFTChanceCalculator.CalculateChances(inputParameters);
+        try {
+            InputParameters inputParameters = TFTChanceCalculator.ParseInputString(inputString);
+            return TFTChanceCalculator.CalculateChances(inputParameters);
+        } catch (Exception e){
+            return "Whoops, it looks like something went wrong";
+        }
     }
 }
