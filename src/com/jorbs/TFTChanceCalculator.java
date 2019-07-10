@@ -124,8 +124,11 @@ public class TFTChanceCalculator {
         return cumalativeProbability;
     }
 
-    private static double GetBinomialDeviation(double probability, double n){
-        return Math.sqrt(n * probability * (1.0 - probability));
+    private static double HypergeometricDeviation(double population, double desired){
+        double N = population;
+        double k = desired;
+        double n = NUM_PICKS;
+        return n * k * (N - k) * (N - n) / (N * N * (N - 1));
     }
 
     protected static double ProbabilityBeforeBroke(double probability, int goldRemaining){
@@ -178,12 +181,12 @@ public class TFTChanceCalculator {
         double tierProbability = ProbabilityTable[parameters.CurrentLevel - 1][parameters.Tier - 1];
         double champChoiceProbability = GetChoiceProbability(parameters.Remaining, parameters.Others, NUM_PICKS);
         double totalProbability = tierProbability * champChoiceProbability;
-        double singleRerollDeviation = REROLL_COST *  GetBinomialDeviation(totalProbability, 1);
+        double deviation = REROLL_COST *  HypergeometricDeviation(parameters.Remaining + parameters.Others, parameters.Remaining);
         double probabilityBeforeBroke = ProbabilityBeforeBroke(totalProbability, parameters.GoldAvailable);
 
         return String.format("%.2f%% likely per reroll, deviation of cost: %.2f gold, chance to hit before broke: %.2f%%.",
                 totalProbability * 100,
-                singleRerollDeviation,
+                deviation,
                 probabilityBeforeBroke * 100);
     }
 
